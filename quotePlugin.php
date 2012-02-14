@@ -1,6 +1,6 @@
 <?php
 /* 
-  Plugin Name: posttype-quote-plugin
+  Plugin Name: quote-posttype-plugin
   Plugin URI: http://gnetos.de
   Description: Plugin zum speichern von Zitaten mit der Hilfe von CustomPostTypes
   Version: 1.2.0
