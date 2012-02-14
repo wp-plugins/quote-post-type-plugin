@@ -14,9 +14,9 @@ Plugin and widget for display of quotes from various categories, possible for jo
 The quotes, sayings, jokes, etc. can be exported and imported via WordPress. 
 They are available as custom post type with its own tab in the menu structure and function such as articles or pages.
 
-Plugin mit Widget zum darstellen von Zitaten aus verschiedenen Kategorien, auch für Witze oder andere Sprüche möglich.
- Die Zitate, Sprüche, Witze etc. können über Wordpress exportiert und importiert werden. 
-Sie sind als Custom Post Type mit einem eigenen Reiter in der Menü Struktur vorhanden und funktionieren wie Artikel oder Seiten.
+Plugin mit Widget zum darstellen von Zitaten aus verschiedenen Kategorien, auch für Witze oder andere Sprueche moeglich.
+ Die Zitate, Sprueche, Witze etc. koennen ueber Wordpress exportiert und importiert werden. 
+Sie sind als Custom Post Type mit einem eigenen Reiter in der Menue Struktur vorhanden und funktionieren wie Artikel oder Seiten.
 
 == Installation ==
 
