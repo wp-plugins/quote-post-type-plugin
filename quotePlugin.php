@@ -3,7 +3,7 @@
   Plugin Name: quote-posttype-plugin
   Plugin URI: http://gnetos.de
   Description: Plugin zum speichern von Zitaten mit der Hilfe von CustomPostTypes
-  Version: 1.2.0
+  Version: 1.2.1
   Author: Tobias Gafner
   Author URI: http://gnetos.de
   License: GPL3
@@ -31,7 +31,14 @@
 define("QS_QUOTE",     "Quote");
 define("QS_QUOTECATEGORY",     "Tags");
 define("QS_QUOTECAUTHOR",     "Author");
-$labelsquote = array(
+/* Translation end here*/
+
+/**
+ * 
+ * Enter description here ...
+ */
+function create_qs_quote_type() {
+	$labelsquote = array(
     'name' => _x( 'Quotes Plugin', 'taxonomy general name' ),
     /*'singular_name' => _x( 'Quote', 'taxonomy singular name' ),
     'search_items' =>  __( 'Search Quotes' ),
@@ -46,17 +53,9 @@ $labelsquote = array(
     'separate_items_with_commas' => __( 'Separate quotes with commas' ),
     'add_or_remove_items' => __( 'Add or remove quotes' ),
     'choose_from_most_used' => __( 'Choose from the most used quotes' ),
-    'menu_name' => __( 'Quotes' ),*/
-);
-/* Translation end here*/
-
-/**
- * 
- * Enter description here ...
- */
-function create_qs_quote_type() {
-	global $labelsquote;
-  register_post_type( 'qs_quote_type',
+	'menu_name' => __( 'Quotes' ),*/
+	);
+  	register_post_type( 'qs_quote_type',
     array(
       'labels' => $labelsquote,
       'public' => true,
@@ -91,7 +90,7 @@ function qs_quote_type_get_taxos($postId,$taxonomy) {
  * @return multitype:string
  */
 function create_qs_quote_type_taxonomy() {
-	function change_columns( $cols ) {
+	function qs_quote_type_change_columns( $cols ) {
 		$cols = array(
 		'cb'       			 => '<input type="checkbox" />',
 		'quote'     		 => __( QS_QUOTE ),
@@ -100,14 +99,6 @@ function create_qs_quote_type_taxonomy() {
 		);
 		return $cols;
 	}
-	// Make these columns sortable
-	/*function sortable_columns() {
-		return array(
-		'quote'     => 'quote',
-	    'quotecategory' => 'quotecategory',
-	    'quoteauthor' => 'quoteauthor'
-		);
-	} */
 	register_taxonomy('quote',
 		array (
 		0 => 'qs_quote_type',
@@ -146,7 +137,7 @@ function create_qs_quote_type_taxonomy() {
 		//	'singular_label' => 'Kategorie'
 		) 
 	);
-	add_filter( "manage_qs_quote_type_posts_columns", "change_columns" );
+	add_filter( "manage_qs_quote_type_posts_columns", "qs_quote_type_change_columns" );
 	//add_filter( "manage_edit-qs_quote_type_sortable_columns", "sortable_columns" );
 }
 
@@ -156,7 +147,7 @@ function create_qs_quote_type_taxonomy() {
  * Enter description here ...
  * @param unknown_type $column
  */
-function custom_columns2( $column ) {
+function qs_quote_type_custom_columns2( $column ) {
 	global $post;
 	$wpg_row_actions  = '<div class="row-actions"><span class="edit"><a title="'.__('Edit this item', 'quotable').'" href="'.get_admin_url().'post.php?post='.$post->ID.'&amp;action=edit">Edit</a> | </span>';
 	$wpg_row_actions .= '<span class="inline hide-if-no-js"><a title="'.__('Edit this item inline', 'quotable').'" class="editinline" href="#">Quick&nbsp;Edit</a> | </span>';
@@ -166,7 +157,12 @@ function custom_columns2( $column ) {
 			echo qs_quote_type_get_taxos( $post->ID, 'quotecategory');
 			break;
 		case "quote":
-			echo qs_quote_type_get_taxos( $post->ID,'quote').$wpg_row_actions;
+			$contentNew = $post->post_excerpt;
+			if(strlen($contentNew) > 0) {
+				echo $contentNew.$wpg_row_actions;
+			} else {
+				echo qs_quote_type_get_taxos( $post->ID,'quote').$wpg_row_actions;
+			}
 			break;
 		case "quoteauthor":
 			echo qs_quote_type_get_taxos( $post->ID,'quoteauthor');
@@ -195,9 +191,12 @@ function qs_quote_type_styling_function($post) {
 	echo '<input type="hidden" name="taxonomy_y" id="taxonomy_noncename" value="' .
 	wp_create_nonce( 'taxonomy_quote' ) . '" />';
 	// Get all theme taxonomy terms
-	$quote = qs_quote_type_get_taxos($post->ID, 'quote'); 
+	$quote = $post->post_excerpt;
+	if(strlen($quote) <= 0){
+		$quote = qs_quote_type_get_taxos( $post->ID,'quote');
+	}
 	?>
-	<p><textarea cols="28" rows="4" name="quote"><?php echo $quote; ?></textarea>
+	<p><textarea cols="80" rows="5" name="excerpt"><?php echo $quote; ?></textarea>
 	</p>
 	<?php
 }
@@ -224,9 +223,6 @@ function qs_quoteauthor_type_styling_function($post) {
  * Enter description here ...
  * @param unknown_type $post_id
  */
-function save_qs_quote_type_taxonomy_quote($post_id) {
-	return save_qs_quote_type_taxonomy_data($post_id,'quote' );
-}
 function save_qs_quote_type_taxonomy_quoteauthor($post_id) {
 	return save_qs_quote_type_taxonomy_data($post_id,'quoteauthor' );
 }
@@ -278,16 +274,20 @@ class QSQuoteSidebarRandom_Widget extends WP_Widget {
 			echo $before_title . $title . $after_title;
 		};
 		$queryString = 'orderby=rand&numberposts=1&post_type=qs_quote_type&post_status=publish';
-    if(!empty($qsCategory) && $qsCategory != '') {
-      $queryString .=  "&quotecategory=".$qsCategory;
-    }
+	    if(!empty($qsCategory) && $qsCategory != '') {
+	      $queryString .=  "&quotecategory=".$qsCategory;
+	    }
 		$posts = get_posts($queryString);
-    foreach($posts as $post) { 
-      echo '<p class="qsquote-widget">'.qs_quote_type_get_taxos($post->ID, 'quote')."</p>";
-      if(!empty($showauthor) && $showauthor > 0) {
-        echo '<p class="qsquote-author-widget" style="float:right">'.qs_quote_type_get_taxos($post->ID, 'quoteauthor')."</p>";
-      }
-    }
+	    foreach($posts as $post) { 
+	    	$quote = $post->post_excerpt;
+	    	if(strlen($quote) <=  0) {
+	    		$quote = qs_quote_type_get_taxos( $post->ID,'quote');
+	    	}
+			echo '<p class="qsquote-widget">'.$quote."</p>";
+			if(!empty($showauthor) && $showauthor > 0) {
+			echo '<p class="qsquote-author-widget" style="float:right">'.qs_quote_type_get_taxos($post->ID, 'quoteauthor')."</p>";
+			}
+	    }
 		echo $args['after_widget'];
 	}
 	function update($new_instance, $old_instance) {
@@ -348,10 +348,9 @@ function qsquoteplugin_register_widgets() {
 }
 
 
-add_action( 'manage_posts_custom_column' , 'custom_columns2');
-add_action('admin_menu', 'add_qs_quote_type_box_quote');
+add_action( 'manage_posts_custom_column' , 'qs_quote_type_custom_columns2');
 /* Use the save_post action to save new post data */
-add_action('save_post', 'save_qs_quote_type_taxonomy_quote');
+add_action('admin_menu', 'add_qs_quote_type_box_quote');
 add_action('admin_menu', 'add_qs_quote_type_box_quoteauthor');
 add_action('save_post', 'save_qs_quote_type_taxonomy_quoteauthor');	
 add_action( 'init', 'create_qs_quote_type' );

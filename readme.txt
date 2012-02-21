@@ -29,10 +29,24 @@ e.g.
 3. Work with the plugin and create quotes
 4. Use the widget in the template
 
+== Upgrade Notice ==
+
+= 1.2.1 =
+* This version fixed little bugfixes
+* You can use more than 255 characters for a quote
+
 
 == Changelog ==
 
-= 1.0.0 =
+= 1.2.1 =
+* More than 255 characters for a quote
+* Bugfixes
+
+= 1.2.0 =
 * Create, update and delete function
 * Widget
 * You can use Wordpress export / import function for the plugin
+
+= 1.0.0 =
+* First Version with XML
+
