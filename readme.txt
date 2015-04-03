@@ -3,7 +3,7 @@ Contributors: tobig
 Donate link: http://gnetos.de/
 Tags: quote
 Requires at least: 3.0.0
-Tested up to: 3.9
+Tested up to: 4.1
 Stable tag: trunk
 
 Plugin and widget for display of quotations from various categories, possible for jokes or other awards.
